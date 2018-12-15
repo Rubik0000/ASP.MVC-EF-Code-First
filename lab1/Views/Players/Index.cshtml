@@ -1,0 +1,47 @@
+﻿@model IEnumerable<lab1.Models.ShowPlayerModel>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Игроки</h2>
+
+<p>
+    @Html.ActionLink("Добавить", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            Имя
+        </th>
+        <th>
+            Фамилия
+        </th>
+        <th>
+            Команды
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Player.FirstName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Player.LastName)
+        </td>
+        <td>            
+            @if (item.Teams.Count() != 0)
+            {
+                @Html.DropDownListFor(modelItem => item.Selected, item.Teams, new { @readonly = "true" })
+            }            
+        </td>
+        <td>
+            @Html.ActionLink("Редактировать", "Edit", new { id=item.Player.PlayerId }) |        
+            @Html.ActionLink("Удалить", "Delete", new { id=item.Player.PlayerId })
+        </td>
+    </tr>
+}
+
+</table>

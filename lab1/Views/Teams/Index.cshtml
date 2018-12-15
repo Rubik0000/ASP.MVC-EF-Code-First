@@ -1,0 +1,38 @@
+﻿@model IEnumerable<lab1.Models.Team>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Команды</h2>
+
+<p>
+    @Html.ActionLink("Добавить", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            Название
+        </th>
+        <th>
+            Город
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.City)
+        </td>
+        <td>
+            @Html.ActionLink("Редактировать", "Edit", new { id=item.TeamId }) |
+            @Html.ActionLink("Удалить", "Delete", new { id=item.TeamId })
+        </td>
+    </tr>
+}
+
+</table>
