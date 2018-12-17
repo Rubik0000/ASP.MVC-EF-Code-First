@@ -7,6 +7,9 @@ using System.Web;
 
 namespace lab1.Models
 {
+    /// <summary>
+    /// The contracts table realizes the many-to-many realation
+    /// </summary>
     public class Contract
     {
         [Key]

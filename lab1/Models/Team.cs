@@ -7,6 +7,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace lab1.Models
 {
+    /// <summary>
+    /// The teams table
+    /// </summary>
     public class Team
     {
         [Key]
@@ -16,9 +19,5 @@ namespace lab1.Models
         public string City { get; set; }
 
         public virtual List<Player> Players { get; set; }
-        public override string ToString()
-        {
-            return Name;
-        }
     }
 }

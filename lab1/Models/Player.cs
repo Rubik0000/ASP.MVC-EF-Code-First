@@ -7,6 +7,9 @@ using System.Web;
 
 namespace lab1.Models
 {
+    /// <summary>
+    /// The players table
+    /// </summary>
     public class Player
     {
         [Key]

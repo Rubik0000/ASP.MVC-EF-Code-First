@@ -1,4 +1,4 @@
-﻿@model lab1.Models.Player
+﻿@model lab1.Models.AddAndEditPlayerModel
 
 @{
     ViewBag.Title = "Edit";
@@ -10,10 +10,10 @@
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
     <div class="form-horizontal">
         <h4>Player</h4>
-        <hr />        
+        <hr />
+        @Html.HiddenFor(model => model.PlayerId)
         <div class="form-group">
             @Html.LabelFor(model => model.FirstName, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
@@ -27,6 +27,16 @@
             <div class="col-md-10">
                 @Html.EditorFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="control-label col-md-2">Команды</div>
+            <div class="col-md-10">
+                @Html.ListBoxFor(model => model.SelctedTeamIds,
+                    new MultiSelectList(Model.AllTeams, "TeamId", "Name"));
+
+
             </div>
         </div>
 

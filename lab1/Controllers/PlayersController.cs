@@ -14,57 +14,36 @@ namespace lab1.Controllers
     {
         private SportContext db = new SportContext();
 
+        /// <summary>
+        /// Gets the teams in which the player plays
+        /// </summary>
+        /// <param name="playerId">The player id</param>
+        /// <returns></returns>
+        private List<Team> GetPlayerTeams(int playerId)
+        {
+            var tbl = from con in db.Contracts
+                      join tm in db.Teams on con.TeamId equals tm.TeamId
+                      where con.PlayerId == playerId
+                      select tm;
+            return tbl.ToList();
+        }
+
         // GET: Players
         public ActionResult Index()
-        {
-
-            //var l = from pl in db.Players
-            //        join con in db.Contracts on pl.PlayerId equals con.PlayerId 
-            //        join tm in db.Teams on con.TeamId equals tm.TeamId into eg
-            //        from b in eg.DefaultIfEmpty()                
-            //        //from t in db.Teams
-            //        select new PlayerWithTeam
-            //        {
-            //            PlayerId = pl.PlayerId,
-            //            FirstName = pl.FirstName,
-            //            LastName = pl.LastName,
-            //            TeamName = b.Name
-            //            //TeamName = pl.PlayerId == con.PlayerId && t.TeamId == con.TeamId ? t.Name : "",
-            //        };
-
-            var players = new List<ShowPlayerModel>();
-            foreach (var player in db.Players)
+        {           
+            var model = db.Players.ToList().Select(pl => new DisplayPlayerModel
             {
-                var modelItem = new ShowPlayerModel();
-                modelItem.Player = player;
-                var tbl = from con in db.Contracts
-                          join tm in db.Teams on con.TeamId equals tm.TeamId
-                          where con.PlayerId == player.PlayerId
-                          select new SelectListItem
-                          {
-                              Text = tm.Name
-                          };
-                modelItem.Teams = tbl.ToList();
-                players.Add(modelItem);
-            }
-            //return View(db.Players.ToList());
-            return View(players);
+                Player = pl,
+                TeamNames = GetPlayerTeams(pl.PlayerId).Select(t => t.Name)
+            }).ToList();
+            return View(model);
         }
 
         // GET: Players/Create
         public ActionResult Create()
         {
-            var model = new AddPlayerModel();
-            model.AllTeams = new List<SelectListItem>();
-            foreach (var team in db.Teams)
-            {
-                var selecterItem = new SelectListItem()
-                {
-                    Text = team.Name,
-                    Value = team.TeamId.ToString()
-                };
-                model.AllTeams.Add(selecterItem);
-            }
+            var model = new AddAndEditPlayerModel();
+            model.AllTeams = db.Teams.ToList();
             return View(model);
         }
 
@@ -72,32 +51,29 @@ namespace lab1.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        //public ActionResult Create([Bind(Include = "PlayerId,FirstName,LastName")] Player player)
-        public ActionResult Create(AddPlayerModel player)
+        [ValidateAntiForgeryToken]        
+        public ActionResult Create(AddAndEditPlayerModel model)
         {
-            if (ModelState.IsValid)
+            if (model.FirstName != null && model.LastName != null)
             {
-                var pl = new Player();
-                //pl.PlayerId = player.PlayerId;
-                pl.FirstName = player.FirstName;
-                pl.LastName = player.LastName;
-                db.Players.Add(pl);
-                if (player.SelctedTeams != null)
+                var player = new Player();
+                player.FirstName = model.FirstName;
+                player.LastName = model.LastName;
+                player = db.Players.Add(player);                
+                if (model.SelctedTeamIds != null)
                 {
-                    foreach (var team in player.SelctedTeams)
+                    var contracts = model.SelctedTeamIds.Select(idTeam => new Contract
                     {
-                        var con = new Contract();
-                        con.PlayerId = player.PlayerId;
-                        con.TeamId = int.Parse(team);
-                        db.Contracts.Add(con);
-                    }
+                        TeamId = idTeam,
+                        PlayerId = model.PlayerId
+                    });
+                    db.Contracts.AddRange(contracts);
                 }
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
 
-            return View(player);
+            return View(model);
         }
 
         // GET: Players/Edit/5
@@ -112,7 +88,11 @@ namespace lab1.Controllers
             {
                 return HttpNotFound();
             }
-            return View(player);
+            AddAndEditPlayerModel model = new AddAndEditPlayerModel(player);
+            model.PlayerId = (int)id;
+            model.SelctedTeamIds = GetPlayerTeams(player.PlayerId).Select(t => t.TeamId).ToList();
+            model.AllTeams = db.Teams.ToList();
+            return View(model);
         }
 
         // POST: Players/Edit/5
@@ -120,15 +100,18 @@ namespace lab1.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "PlayerId,FirstName,LastName")] Player player)
+        public ActionResult Edit(AddAndEditPlayerModel player)
         {
-            if (ModelState.IsValid)
-            {
-                db.Entry(player).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return View(player);
+            var p = db.Players.Find(player.PlayerId);
+            p.FirstName = player.FirstName;
+            p.LastName = player.LastName;
+            var con = db.Contracts.Select(c => c).Where(c => c.PlayerId == p.PlayerId);
+            db.Contracts.RemoveRange(con);
+            var newCon = player.SelctedTeamIds.Select(idTeam => new Contract { TeamId = idTeam, PlayerId = p.PlayerId });
+            db.Contracts.AddRange(newCon);
+            db.Entry(p).State = EntityState.Modified;
+            db.SaveChanges();
+            return RedirectToAction("Index");
         }
 
         // GET: Players/Delete/5

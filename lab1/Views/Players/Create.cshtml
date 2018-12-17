@@ -1,4 +1,4 @@
-﻿@model lab1.Models.AddPlayerModel
+﻿@model lab1.Models.AddAndEditPlayerModel
 
 @{
     ViewBag.Title = "Create";
@@ -33,7 +33,9 @@
         <div class="form-group">
             <div class="control-label col-md-2">Команды</div>
             <div class="col-md-10">                
-                @Html.ListBoxFor(n => n.SelctedTeams, Model.AllTeams)
+                @Html.ListBoxFor(model => model.SelctedTeamIds,
+                    new MultiSelectList(Model.AllTeams, "TeamId", "Name"))
+                
             </div>
         </div>
 

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<lab1.Models.ShowPlayerModel>
+﻿@model IEnumerable<lab1.Models.DisplayPlayerModel>
 
 @{
     ViewBag.Title = "Index";
@@ -32,9 +32,9 @@
             @Html.DisplayFor(modelItem => item.Player.LastName)
         </td>
         <td>            
-            @if (item.Teams.Count() != 0)
+            @if (item.TeamNames.Count() != 0)
             {
-                @Html.DropDownListFor(modelItem => item.Selected, item.Teams, new { @readonly = "true" })
+                @Html.DropDownList("Команды", new SelectList(item.TeamNames))
             }            
         </td>
         <td>

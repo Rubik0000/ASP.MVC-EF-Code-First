@@ -154,11 +154,10 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\AddPlayerModel.cs" />
+    <Compile Include="Models\AddAndEditPlayerModel.cs" />
     <Compile Include="Models\Contracts.cs" />
     <Compile Include="Models\Player.cs" />
-    <Compile Include="Models\PlayerWithTeam.cs" />
-    <Compile Include="Models\ShowPlayerModel.cs" />
+    <Compile Include="Models\DisplayPlayerModel.cs" />
     <Compile Include="Models\SportContext.cs" />
     <Compile Include="Models\Team.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
